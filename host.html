@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title Verification System</title>
+    <style>
+        /* Your existing CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #eed9c4;
+        }
+        header {
+            background: linear-gradient(to left, #F1AC88FF, #783937FF, #F1AC88FF);
+            color: #FFF;
+            padding: 5px; 
+            text-align: center;
+            border-radius: 8px;
+            font-size: 1.3em;
+            max-width: 650px; 
+            margin: 0 auto; 
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="email"], input[type="date"], button, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: linear-gradient(to left, #F1AC88FF, #783937FF, #F1AC88FF);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(to left, #783937FF, #F1AC88FF, #783937FF); 
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .similar {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+        .unique {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        fieldset {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        legend {
+            font-weight: bold;
+            padding: 0 10px;
+        }
+        label {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1 style="color:#eed9c4; font-size: 35px;">TITLE VERIFICATION SYSTEM</h1>
+</header>
+
+<div class="container">
+    <input type="text" id="nameInput" placeholder="Enter Your Name..." required>
+    <input type="text" id="streamInput" placeholder="Enter your stream..." required>
+    <input type="date" id="dateInput" required>
+    
+    <fieldset>
+        <legend>Select the Topic of the Title:</legend>
+        <input type="radio" name="topic" id="hardware" value="hardware" required>
+        <label for="hardware">Hardware</label>
+        <input type="radio" name="topic" id="software" value="software">
+        <label for="software">Software</label>
+    </fieldset>
+    
+    <input type="text" id="titleInput" placeholder="Enter a new title..." required>
+    
+    <input type="email" id="emailInput" placeholder="Enter your email..." required>
+    
+    <textarea id="comments" name="comments" placeholder="Title Description..." rows="4"></textarea>
+    <button id="checkTitleButton">CHECK TITLE</button>
+    <div id="result" class="result" style="display: none;"></div>
+</div>
+
+<script>
+    // Function to load existing titles from Local Storage or initialize with predefined titles
+    function loadExistingTitles() {
+        const storedTitles = localStorage.getItem('existingTitles');
+        if (storedTitles) {
+            return JSON.parse(storedTitles);
+        } else {
+            // Predefined list of existing titles
+            const predefinedTitles = [
+                "A Survey on Hardware Security: Vulnerabilities and Countermeasures",
+                "Advancements in FPGA Technology for High-Performance Computing",
+                "Energy-Efficient Hardware Architectures for Machine Learning Applications",
+                "Investigating the Impact of 3D Printing on Hardware Prototyping",
+                "Machine Learning Algorithms for Predictive Maintenance in Software Systems",
+                "Software Vulnerabilities and Their Impact on Cybersecurity",
+                "A Comparative Study of Open-Source and Proprietary Software Solutions",
+                "Enhancing Software Reliability Through Automated Testing Techniques",
+                "Integrating Hardware and Software for IoT Systems: Challenges and Solutions",
+                "A Unified Framework for Hardware-Software Co-Design in Embedded Systems",
+                "Performance Analysis of Hardware-Software Interfaces in Cyber-Physical Systems",
+                "The Future of Smart Devices: Hardware-Software Convergence",
+                "Design of Energy-Efficient Hardware for Edge Computing",
+                "A Comprehensive Review of Hardware Security Architectures",
+                "FPGA-Based Acceleration for Machine Learning Algorithms",
+                "Impact of 3D Printing on Rapid Prototyping in Hardware Development",
+                "Hardware Optimization Techniques for High-Performance Computing",
+                "Agile Software Development: Methods and Best Practices",
+                "Security Vulnerabilities in Software: A Systematic Review",
+                "Comparative Analysis of Open-Source Software Licenses",
+                "Automated Testing Approaches to Enhance Software Quality",
+                "Machine Learning Techniques for Software Bug Prediction",
+                "Challenges in Integrating Hardware and Software for IoT Solutions",
+                "Hardware-Software Co-Design for Efficient Embedded Systems",
+                "Performance Evaluation of Cyber-Physical Systems: A Hardware-Software Perspective",
+                "The Role of Software in Enhancing Hardware Performance",
+                "Convergence of Hardware and Software: Future Trends in Smart Devices",
+                "Emerging Trends in Quantum Computing Hardware",
+                "Design and Implementation of Reconfigurable Hardware Systems",
+                "Efficient Cooling Solutions for High-Performance Computing Hardware",
+                "Assessing the Reliability of Hardware Components in Critical Systems",
+                "Developments in ASIC Design for IoT Applications",
+                "Trends in Software Development Methodologies: A Historical Perspective",
+                "Analyzing the Impact of Software Bugs on System Performance",
+                "Using Artificial Intelligence to Enhance Software Testing",
+                "Exploring Microservices Architecture: Benefits and Challenges",
+                "The Role of DevOps in Modern Software Development",
+                "Integrating Software Solutions with Hardware Platforms in Robotics",
+                "Optimizing Hardware-Software Interfaces for Enhanced Performance",
+                "Adaptive Hardware-Software Systems for Real-Time Applications",
+                "The Future of Wearable Technology: Hardware-Software Integration",
+                "Challenges in Developing Cyber-Physical Systems: A Hardware-Software Approach"
+            ];
+            // Save predefined titles to Local Storage
+            localStorage.setItem('existingTitles', JSON.stringify(predefinedTitles));
+            return predefinedTitles;
+        }
+    }
+
+    // Function to save updated titles to Local Storage
+    function saveExistingTitles(titles) {
+        localStorage.setItem('existingTitles', JSON.stringify(titles));
+    }
+
+    // Initialize existingTitles
+    let existingTitles = loadExistingTitles();
+
+    document.getElementById('checkTitleButton').addEventListener('click', checkTitle);
+
+    function checkTitle() {
+        const name = document.getElementById('nameInput').value.trim();
+        const stream = document.getElementById('streamInput').value.trim();
+        const date = document.getElementById('dateInput').value;
+        const topicElems = document.getElementsByName('topic');
+        let topic = '';
+        for (const elem of topicElems) {
+            if (elem.checked) {
+                topic = elem.value;
+                break;
+            }
+        }
+        const title = document.getElementById('titleInput').value.trim();
+        const email = document.getElementById('emailInput').value.trim();
+        const comments = document.getElementById('comments').value.trim();
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'none';
+
+        // Input Validation
+        if (!name || !stream || !date || !topic || !title || !email) {
+            alert("Please fill in all the fields.");
+            return;
+        }
+
+        // Check if the entered title exists (case-insensitive)
+        const isSimilar = existingTitles.some(existingTitle => 
+            existingTitle.toLowerCase() === title.toLowerCase()
+        );
+
+        if (isSimilar) {
+            alert("The entered title is already found. Please enter a different title.");
+            // Display similar message
+            resultDiv.innerHTML = `The title "<strong>${title}</strong>" is similar to an existing title. Please enter another title.`;
+            resultDiv.className = 'result similar';
+            resultDiv.style.display = 'block';
+        } else {
+            alert("The entered title is not found and is unique.");
+            // Add the new title to the existingTitles array
+            existingTitles.push(title);
+            // Save the updated list to Local Storage
+            saveExistingTitles(existingTitles);
+            // Display unique message
+            resultDiv.innerHTML = `The title "<strong>${title}</strong>" is unique and has been successfully submitted.`;
+            resultDiv.className = 'result unique';
+            resultDiv.style.display = 'block';
+            // Optionally, reset the form fields
+            resetForm();
+        }
+    }
+
+    // Function to reset the form fields after successful submission
+    function resetForm() {
+        document.getElementById('nameInput').value = '';
+        document.getElementById('streamInput').value = '';
+        document.getElementById('dateInput').value = '';
+        const topicElems = document.getElementsByName('topic');
+        for (const elem of topicElems) {
+            elem.checked = false;
+        }
+        document.getElementById('titleInput').value = '';
+        document.getElementById('emailInput').value = '';
+        document.getElementById('comments').value = '';
+    }
+</script>
+
+</body>
+</html>

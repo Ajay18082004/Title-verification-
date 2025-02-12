@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title Verification System</title>
+    <style>
+        /* Your existing CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #eed9c4;
+        }
+        header {
+            background: linear-gradient(to left, #F1AC88FF, #783937FF, #F1AC88FF);
+            color: #FFF;
+            padding: 5px; 
+            text-align: center;
+            border-radius: 8px;
+            font-size: 1.3em;
+            max-width: 650px; 
+            margin: 0 auto; 
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="email"], input[type="date"], input[type="number"], button, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: linear-gradient(to left, #F1AC88FF, #783937FF, #F1AC88FF);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(to left, #783937FF, #F1AC88FF, #783937FF); 
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .similar {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+        .unique {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        fieldset {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        legend {
+            font-weight: bold;
+            padding: 0 10px;
+        }
+        label {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1 style="color:#eed9c4; font-size: 35px;">TITLE VERIFICATION SYSTEM</h1>
+</header>
+
+<div class="container">
+    <input type="text" id="nameInput" placeholder="Enter Your Name..." required>
+    <input type="text" id="streamInput" placeholder="Enter your stream..." required>
+    <input type="date" id="dateInput" required>
+    
+    <fieldset>
+        <legend>Select the Topic of the Title:</legend>
+        <input type="radio" name="topic" id="hardware" value="hardware">
+        <label for="hardware">Hardware</label>
+        <input type="radio" name="topic" id="software" value="software">
+        <label for="software">Software</label>
+    </fieldset>
+    
+    <input type="text" id="titleInput" placeholder="Enter a new title..." required>
+    
+    <input type="email" id="emailInput" placeholder="Enter your email..." required>
+    
+    <textarea id="comments" name="comments" placeholder="Title Description..." rows="4"></textarea>
+    <button onclick="checkTitle()">CHECK TITLE</button>
+    <div id="result" class="result" style="display: none;"></div>
+</div>
+
+<script>
+    async function checkTitle() {
+        const name = document.getElementById('nameInput').value.trim();
+        const stream = document.getElementById('streamInput').value.trim();
+        const date = document.getElementById('dateInput').value;
+        const topicElems = document.getElementsByName('topic');
+        let topic = '';
+        for (const elem of topicElems) {
+            if (elem.checked) {
+                topic = elem.value;
+                break;
+            }
+        }
+        const title = document.getElementById('titleInput').value.trim();
+        const email = document.getElementById('emailInput').value.trim();
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'none';
+
+        if (!name || !stream || !date || !topic || !title || !email) {
+            alert("Please fill in all the fields.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/check-title', { // Use relative path
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, stream, date, topic, title, email }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.isSimilar) {
+                resultDiv.innerHTML = `The title "<strong>${title}</strong>" is similar to an existing title "${data.existingTitle}" (Similarity: ${(data.similarity * 100).toFixed(2)}%). Please enter another title.`;
+                resultDiv.className = 'result similar';
+            } else {
+                resultDiv.innerHTML = `The title "<strong>${title}</strong>" is unique and has been successfully submitted.`;
+                resultDiv.className = 'result unique';
+            }
+
+            resultDiv.style.display = 'block';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while checking the title.');
+        }
+	
+	</script>
+
+</body>
+</html>
